@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: MySQL-8.2
--- Время создания: Ноя 18 2024 г., 19:10
+-- Время создания: Ноя 18 2024 г., 23:37
 -- Версия сервера: 8.2.0
 -- Версия PHP: 8.1.28
 
@@ -33,9 +33,16 @@ CREATE TABLE `files` (
   `task_id` int DEFAULT NULL,
   `uploaded_by` int NOT NULL,
   `file_name` varchar(255) NOT NULL,
-  `file_type` varchar(50) NOT NULL,
   `file_url` varchar(500) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `files`
+--
+
+INSERT INTO `files` (`file_id`, `project_id`, `task_id`, `uploaded_by`, `file_name`, `file_url`) VALUES
+(1, 1, 1, 1, 'project.pdf', 'https://project.pdf'),
+(2, 2, NULL, 2, 'notes.docx', 'https://notes.docx');
 
 -- --------------------------------------------------------
 
@@ -50,6 +57,14 @@ CREATE TABLE `projects` (
   `created_by` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Дамп данных таблицы `projects`
+--
+
+INSERT INTO `projects` (`project_id`, `name`, `description`, `created_by`) VALUES
+(1, 'Project1', NULL, 1),
+(2, 'Project2', 'project2 description', 2);
+
 -- --------------------------------------------------------
 
 --
@@ -59,8 +74,16 @@ CREATE TABLE `projects` (
 CREATE TABLE `project_users` (
   `project_id` int NOT NULL,
   `user_id` int NOT NULL,
-  `role` enum('owner','admin','member','viewer') NOT NULL DEFAULT 'member'
+  `role` enum('owner','admin','viewer') NOT NULL DEFAULT 'viewer'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `project_users`
+--
+
+INSERT INTO `project_users` (`project_id`, `user_id`, `role`) VALUES
+(1, 2, 'viewer'),
+(2, 2, 'owner');
 
 -- --------------------------------------------------------
 
@@ -74,9 +97,19 @@ CREATE TABLE `tasks` (
   `title` varchar(255) NOT NULL,
   `description` text,
   `created_by` int NOT NULL,
-  `status` enum('To do','in progress','completed') NOT NULL DEFAULT 'To do',
+  `status` enum('preparation','in progress','completed') NOT NULL DEFAULT 'preparation',
   `deadline` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `tasks`
+--
+
+INSERT INTO `tasks` (`task_id`, `project_id`, `title`, `description`, `created_by`, `status`, `deadline`) VALUES
+(1, 1, 'Task1', 'description task1', 1, 'completed', '2024-12-01'),
+(2, 2, 'Task2', 'description task2', 2, 'in progress', '2024-12-15'),
+(3, 1, 'Task3', 'description task3', 1, 'preparation', '2025-01-20'),
+(4, 2, 'Task4', 'description task4', 2, 'in progress', '2024-12-30');
 
 -- --------------------------------------------------------
 
@@ -88,6 +121,14 @@ CREATE TABLE `task_assignees` (
   `task_id` int NOT NULL,
   `user_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `task_assignees`
+--
+
+INSERT INTO `task_assignees` (`task_id`, `user_id`) VALUES
+(1, 1),
+(2, 2);
 
 -- --------------------------------------------------------
 
@@ -104,6 +145,14 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
+-- Дамп данных таблицы `users`
+--
+
+INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `full_name`) VALUES
+(1, 'john', 'john@gmail.com', 'qwerty', 'John Vinc'),
+(2, 'jason', 'jason@gmail.com', '12345', 'Jason Born');
+
+--
 -- Индексы сохранённых таблиц
 --
 
@@ -113,8 +162,8 @@ CREATE TABLE `users` (
 ALTER TABLE `files`
   ADD PRIMARY KEY (`file_id`),
   ADD KEY `project_id` (`project_id`),
-  ADD KEY `task_id` (`task_id`),
-  ADD KEY `uploaded_by` (`uploaded_by`);
+  ADD KEY `uploaded_by` (`uploaded_by`),
+  ADD KEY `task_id` (`task_id`);
 
 --
 -- Индексы таблицы `projects`
@@ -160,25 +209,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT для таблицы `files`
 --
 ALTER TABLE `files`
-  MODIFY `file_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `file_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `project_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `project_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `task_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `task_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -189,8 +238,8 @@ ALTER TABLE `users`
 --
 ALTER TABLE `files`
   ADD CONSTRAINT `files_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `files_ibfk_2` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`task_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `files_ibfk_3` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`user_id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `files_ibfk_3` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`user_id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `files_ibfk_4` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`task_id`) ON DELETE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `projects`
@@ -216,8 +265,8 @@ ALTER TABLE `tasks`
 -- Ограничения внешнего ключа таблицы `task_assignees`
 --
 ALTER TABLE `task_assignees`
-  ADD CONSTRAINT `task_assignees_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`task_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `task_assignees_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `task_assignees_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `task_assignees_ibfk_3` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`task_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
