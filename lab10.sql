@@ -66,21 +66,11 @@ CREATE TABLE `station_order` (
 
 CREATE TABLE `transitions` (
   `id` int NOT NULL,
-  `transition_group` int NOT NULL,
   `station_id_from` int NOT NULL,
   `station_id_to` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
-
---
--- Структура таблицы `transition_groups`
---
-
-CREATE TABLE `transition_groups` (
-  `id` int NOT NULL,
-  `name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Индексы сохранённых таблиц
@@ -114,13 +104,6 @@ ALTER TABLE `transitions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `station_id_from` (`station_id_from`),
   ADD KEY `station_id_to` (`station_id_to`),
-  ADD KEY `transition_group` (`transition_group`);
-
---
--- Индексы таблицы `transition_groups`
---
-ALTER TABLE `transition_groups`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT для сохранённых таблиц
@@ -151,12 +134,6 @@ ALTER TABLE `transitions`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT для таблицы `transition_groups`
---
-ALTER TABLE `transition_groups`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
@@ -179,7 +156,6 @@ ALTER TABLE `station_order`
 ALTER TABLE `transitions`
   ADD CONSTRAINT `transitions_ibfk_1` FOREIGN KEY (`station_id_from`) REFERENCES `stations` (`id`),
   ADD CONSTRAINT `transitions_ibfk_2` FOREIGN KEY (`station_id_to`) REFERENCES `stations` (`id`),
-  ADD CONSTRAINT `transitions_ibfk_3` FOREIGN KEY (`transition_group`) REFERENCES `transition_groups` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
